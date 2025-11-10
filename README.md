@@ -93,7 +93,6 @@ You can override the default by setting:
    for already-installed binaries.
 
 2. **Binary lookup is restricted to**:
-   - Binaries already on your `PATH` (via `which`)
    - The `cargox` install directory only
 
 3. **Environment isolation**: When installing packages, `cargox` removes all

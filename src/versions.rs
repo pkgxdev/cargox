@@ -100,16 +100,12 @@ pub fn ensure_bin_dir() -> Result<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_support::env_lock;
     use std::env;
     use std::fs;
     use std::path::Path;
-    use std::sync::{Mutex, MutexGuard, OnceLock};
+    use std::sync::MutexGuard;
     use tempfile::tempdir;
-
-    fn env_lock() -> &'static Mutex<()> {
-        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
-        LOCK.get_or_init(|| Mutex::new(()))
-    }
 
     struct InstallDirGuard {
         _guard: MutexGuard<'static, ()>,

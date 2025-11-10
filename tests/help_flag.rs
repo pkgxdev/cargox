@@ -1,5 +1,7 @@
 use std::process::Command;
 
+const HELP_SNIPPET: &str = "Usage: cargox";
+
 /// This test ensures that flags like --help after the crate spec are passed to the target binary
 /// and not intercepted by cargox's own argument parser.
 ///
@@ -27,12 +29,12 @@ fn test_help_flag_passed_to_binary() {
     // The key assertion: cargox's help should NOT appear
     // If the help was intercepted, we'd see "Run Cargo binaries on demand" in the output
     assert!(
-        !stdout.contains("Run Cargo binaries on demand"),
+        !stdout.contains(HELP_SNIPPET),
         "cargox help text appeared in stdout, indicating --help was intercepted.\nStdout:\n{}",
         stdout
     );
     assert!(
-        !stderr.contains("Run Cargo binaries on demand"),
+        !stderr.contains(HELP_SNIPPET),
         "cargox help text appeared in stderr, indicating --help was intercepted.\nStderr:\n{}",
         stderr
     );
@@ -56,7 +58,7 @@ fn test_cargox_help_still_works() {
 
     // When --help comes before the crate spec, it should show cargox's help
     assert!(
-        stdout.contains("Run Cargo binaries on demand"),
+        stdout.contains(HELP_SNIPPET),
         "cargox help should appear when --help is used without a crate spec.\nStdout:\n{}",
         stdout
     );
@@ -83,7 +85,7 @@ fn test_cargox_flags_before_crate_spec() {
     // If --force was parsed correctly, cargox would proceed with installation
     // We should not see cargox's help text
     assert!(
-        !stderr.contains("Run Cargo binaries on demand"),
+        !stderr.contains(HELP_SNIPPET),
         "cargox help text appeared, indicating argument parsing failed.\nStderr:\n{}",
         stderr
     );
@@ -106,12 +108,12 @@ fn test_bin_flag_parsing() {
 
     // Should not show cargox help
     assert!(
-        !stdout.contains("Run Cargo binaries on demand"),
+        !stdout.contains(HELP_SNIPPET),
         "cargox help appeared when it shouldn't.\nStdout:\n{}",
         stdout
     );
     assert!(
-        !stderr.contains("Run Cargo binaries on demand"),
+        !stderr.contains(HELP_SNIPPET),
         "cargox help appeared when it shouldn't.\nStderr:\n{}",
         stderr
     );

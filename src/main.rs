@@ -4,6 +4,8 @@ mod installer;
 mod paths;
 mod registry;
 mod target;
+#[cfg(test)]
+mod test_support;
 mod versions;
 
 use std::path::PathBuf;
@@ -15,14 +17,12 @@ use semver::{Version, VersionReq};
 use cli::Cli;
 use executor::execute_binary;
 use installer::ensure_installed;
-use paths::resolve_binary_path;
 use registry::{fetch_highest_matching_version, fetch_latest_version};
 use target::{Target, VersionSpec, parse_spec};
 use versions::{find_installed_version, latest_installed, versioned_binary_path};
 
 enum RunPlan {
     UseInstalled { path: PathBuf },
-    UseSystem { path: PathBuf },
     InstallAndRun { version: Version },
 }
 
@@ -71,10 +71,6 @@ fn resolve_unspecified(target: &Target, cli: &Cli) -> Result<RunPlan> {
                 path: installed.path,
             });
         }
-
-        if let Ok(path) = resolve_binary_path(&target.binary) {
-            return Ok(RunPlan::UseSystem { path });
-        }
     }
 
     let version = fetch_latest_version(&target.crate_name)?;
@@ -116,7 +112,6 @@ fn resolve_requirement(target: &Target, cli: &Cli, requirement: &VersionReq) -> 
 fn execute_plan(plan: &RunPlan, target: &Target, cli: &Cli) -> Result<ExitStatus> {
     match plan {
         RunPlan::UseInstalled { path } => execute_binary(path, &cli.args),
-        RunPlan::UseSystem { path } => execute_binary(path, &cli.args),
         RunPlan::InstallAndRun { version } => {
             ensure_installed(target, cli, version)?;
             let binary_path = versioned_binary_path(&target.binary, version)?;

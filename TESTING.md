@@ -50,29 +50,15 @@ Verifies that when no override is set, we use platform-appropriate XDG directori
 
 ### 3. Directory Isolation Tests
 
-These tests ensure we don't check or use standard Cargo/system directories:
+Directory isolation is enforced by refusing to execute binaries outside the sandboxed install directory (see the Execution Guard tests below).
 
-#### `candidate_bin_dirs_only_checks_cargox_dir`
-**Critical sandboxing test**: Verifies that:
-- Only 2 directories are checked (our install dir and install dir/bin)
-- No standard directories like `~/.cargo/bin` are included
-- All checked directories contain "cargox" in the path
+### 4. Execution Guard Tests
 
-#### `candidate_bin_dirs_ignores_cargo_env_vars`
-**Critical sandboxing test**: Verifies that even when Cargo-related environment variables are set, they are completely ignored:
-- `CARGO_INSTALL_ROOT` - ignored
-- `CARGO_HOME` - ignored
-- `BINSTALL_INSTALL_PATH` - ignored
+#### `allows_binaries_inside_install_dir`
+Unit test in `executor.rs` that ensures binaries located inside the sandboxed install directory are allowed to run.
 
-This ensures complete isolation from the user's Cargo configuration.
-
-### 4. Binary Resolution Tests
-
-#### `resolve_binary_path_checks_which_first`
-Verifies that we check `PATH` first via the `which` crate, allowing users to override with binaries already in their PATH.
-
-#### `resolve_binary_path_falls_back_to_cargox_dir`
-Verifies that after checking PATH, we fall back to our sandboxed directory.
+#### `rejects_binaries_outside_install_dir`
+Unit test in `executor.rs` that ensures we refuse to execute binaries that live outside the sandboxed install directory, preventing delegation to system-wide paths.
 
 ### 5. Environment Sanitization Tests
 
@@ -87,11 +73,6 @@ The function removes these variables before calling `cargo install` or `cargo-bi
 - `BINSTALL_INSTALL_PATH`
 - `RUSTUP_HOME`
 - `RUSTUP_TOOLCHAIN`
-
-### 6. Override Tests
-
-#### `cargox_install_dir_override_is_respected`
-Verifies that users can override the install directory with `CARGOX_INSTALL_DIR` and that the override is properly respected.
 
 ## Running Tests
 
