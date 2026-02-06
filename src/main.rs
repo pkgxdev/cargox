@@ -65,12 +65,12 @@ fn resolve_run_plan(target: &Target, cli: &Cli) -> Result<RunPlan> {
 }
 
 fn resolve_unspecified(target: &Target, cli: &Cli) -> Result<RunPlan> {
-    if !cli.force {
-        if let Some(installed) = latest_installed(&target.binary)? {
-            return Ok(RunPlan::UseInstalled {
-                path: installed.path,
-            });
-        }
+    if !cli.force
+        && let Some(installed) = latest_installed(&target.binary)?
+    {
+        return Ok(RunPlan::UseInstalled {
+            path: installed.path,
+        });
     }
 
     let version = fetch_latest_version(&target.crate_name)?;
